@@ -8,12 +8,12 @@ import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class Server extends JFrame implements ActionListener {
+public class Client extends JFrame implements ActionListener {
     JTextField text;
     JPanel a1;
     Box vertical = Box.createVerticalBox();
 
-    Server() {
+    Client() {
         setLayout(null);
 
         JPanel p1 = new JPanel();
@@ -36,7 +36,7 @@ public class Server extends JFrame implements ActionListener {
             }
         });
 
-        ImageIcon i4 = new ImageIcon(ClassLoader.getSystemResource("icons/1.png"));
+        ImageIcon i4 = new ImageIcon(ClassLoader.getSystemResource("icons/2.png"));
         Image i5 = i4.getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT);
         ImageIcon i6 = new ImageIcon(i5);
         JLabel profile = new JLabel(i6);
@@ -64,7 +64,7 @@ public class Server extends JFrame implements ActionListener {
         more.setBounds(400, 20, 10, 25);
         p1.add(more);
 
-        JLabel name = new JLabel("James");
+        JLabel name = new JLabel("Mary");
         name.setBounds(110, 15, 100, 18);
         name.setForeground(Color.WHITE);
         name.setFont(new Font("SAN_SERIF", Font.BOLD, 18));
@@ -95,14 +95,14 @@ public class Server extends JFrame implements ActionListener {
 
         setSize(450, 700);
         setUndecorated(true);
-        setLocation(450, 150);
+        setLocation(1050, 150);
         getContentPane().setBackground(new Color(87, 170, 252));
 
         setVisible(true);
     }
 
     public static void main(String[] args) {
-        new Server();
+        new Client();
     }
 
     @Override
@@ -148,3 +148,4 @@ public class Server extends JFrame implements ActionListener {
         return panel;
     }
 }
+
