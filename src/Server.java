@@ -5,22 +5,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class Server extends JFrame implements ActionListener {
+public class Server implements ActionListener {
     JTextField text;
     JPanel a1;
-    Box vertical = Box.createVerticalBox();
+    static Box vertical = Box.createVerticalBox();
+    static JFrame f = new JFrame();
+    static DataOutputStream dout;
 
     Server() {
-        setLayout(null);
+        f.setLayout(null);
 
         JPanel p1 = new JPanel();
         p1.setBackground(new Color(3, 106, 208));
         p1.setBounds(0, 0, 450, 70);
         p1.setLayout(null);
-        add(p1);
+        f.add(p1);
 
         ImageIcon i1 = new ImageIcon(ClassLoader.getSystemResource("icons/3.png"));
         Image i2 = i1.getImage().getScaledInstance(25, 25, Image.SCALE_DEFAULT);
@@ -31,7 +37,7 @@ public class Server extends JFrame implements ActionListener {
 
         back.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent ae) {
-                setVisible(false);
+                //setVisible(false);
                 System.exit(0);
             }
         });
@@ -78,12 +84,12 @@ public class Server extends JFrame implements ActionListener {
 
         a1 = new JPanel();
         a1.setBounds(5, 75, 440, 570);
-        add(a1);
+        f.add(a1);
 
         text = new JTextField();
         text.setBounds(5, 655, 310, 40);
         text.setFont(new Font("SAN_SERIF", Font.BOLD, 16));
-        add(text);
+        f.add(text);
 
         JButton send = new JButton("Send");
         send.setBounds(320, 655, 123, 40);
@@ -91,39 +97,66 @@ public class Server extends JFrame implements ActionListener {
         send.setForeground(Color.WHITE);
         send.addActionListener(this);
         send.setFont(new Font("SAN_SERIF", Font.BOLD, 18));
-        add(send);
+        f.add(send);
 
-        setSize(450, 700);
-        setUndecorated(true);
-        setLocation(450, 150);
-        getContentPane().setBackground(new Color(87, 170, 252));
+        f.setSize(450, 700);
+        f.setUndecorated(true);
+        f.setLocation(450, 150);
+        f.getContentPane().setBackground(new Color(87, 170, 252));
 
-        setVisible(true);
+        f.setVisible(true);
     }
 
     public static void main(String[] args) {
         new Server();
+        try {
+            ServerSocket skt = new ServerSocket(6001);
+            while(true) {
+                Socket s = skt.accept();
+                DataInputStream din = new DataInputStream(s.getInputStream());
+                dout = new DataOutputStream(s.getOutputStream());
+
+                while(true) {
+                    String msg = din.readUTF();
+                    JPanel panel = formatLabel(msg);
+
+                    JPanel left = new JPanel(new BorderLayout());
+                    left.add(panel, BorderLayout.LINE_START);
+                    vertical.add(left);
+                    f.validate();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-        String out = text.getText();
-        JPanel p2 = formatLabel(out);
+        try {
+            String out = text.getText();
 
-        a1.setLayout(new BorderLayout());
+            JPanel p2 = formatLabel(out);
 
-        JPanel right = new JPanel(new BorderLayout());
-        right.add(p2, BorderLayout.LINE_END);
-        vertical.add(right);
-        vertical.add(Box.createVerticalStrut(15));
+            a1.setLayout(new BorderLayout());
 
-        a1.add(vertical, BorderLayout.PAGE_START);
+            JPanel right = new JPanel(new BorderLayout());
+            right.add(p2, BorderLayout.LINE_END);
+            vertical.add(right);
+            vertical.add(Box.createVerticalStrut(15));
 
-        text.setText("");
+            a1.add(vertical, BorderLayout.PAGE_START);
 
-        repaint();
-        invalidate();
-        validate();
+            dout.writeUTF(out);
+
+            text.setText("");
+
+            f.repaint();
+            f.invalidate();
+            f.validate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static JPanel formatLabel(String out) {
